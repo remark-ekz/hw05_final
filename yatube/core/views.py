@@ -7,3 +7,7 @@ def page_not_found(request, exception):
 
 def csrf_failure(request, reason=''):
     return render(request, 'core/403.html', {'path': request.path}, status=403)
+
+
+def page_internal_server(request, reason=''):
+    return render(request, 'core/500.html', {'path': request.path}, status=500)
