@@ -1,14 +1,15 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.core.cache import cache
+from django.views.decorators.cache import cache_page
 
 from .utils import paginator_view
 from .forms import PostForm, CommentForm
 from .models import Group, Post, User, Follow
 
 
+@cache_page(20)
 def index(request):
-    post_list = cache.get_or_set('index_page', Post.objects.all(), timeout=20)
+    post_list = Post.objects.all()
     page_obj = paginator_view(post_list, request)
     context = {
         'page_obj': page_obj,
@@ -31,8 +32,6 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     post_list = author.posts.all()
     page_obj = paginator_view(post_list, request)
-    # if request.user == author:
-
     following = request.user.is_authenticated and Follow.objects.filter(
         user=request.user,
         author__username=username).exists()
@@ -40,7 +39,6 @@ def profile(request, username):
         'page_obj': page_obj,
         'author': author,
         'following': following,
-
     }
     return render(request, 'posts/profile.html', context)
 
@@ -128,8 +126,6 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
-    user = request.user
     author = get_object_or_404(User, username=username)
-    follow = Follow.objects.filter(user=user, author=author)
-    follow.delete()
+    Follow.objects.filter(user=request.user, author=author).delete()
     return redirect('posts:profile', username=username)

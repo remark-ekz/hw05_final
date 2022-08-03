@@ -85,7 +85,7 @@ class FormTests(TestCase):
         )
 
     def test_valid_form_edit(self):
-        '''Проверка формы при редактировании'''
+        """Проверка формы при редактировании"""
         posts_count = Post.objects.count()
         form_data = {
             'text': 'Текст пост',
@@ -104,12 +104,13 @@ class FormTests(TestCase):
         self.assertEqual(posts_count, edit_post_count)
         self.assertTrue(
             Post.objects.filter(
-                text='Текст пост',
+                text=form_data.get('text'),
                 group=FormTests.group,
                 image='posts/small.gif',
             ).exists())
 
     def test_comment_only_authorized_client(self):
+        """Проверка формы комментариев для авторизованного пользователя"""
         comments_count = Comment.objects.count()
         form_data = {
             'text': 'Первый комментарий'
@@ -124,10 +125,11 @@ class FormTests(TestCase):
         self.assertNotEqual(comments_count, new_comment_count)
         self.assertTrue(
             Comment.objects.filter(
-                text='Первый комментарий'
+                text=form_data.get('text')
             ).exists())
 
     def test_comment_only_guest_client(self):
+        """Проверка формы комментариев для неавторизованного пользователя"""
         comments_count = Comment.objects.count()
         form_data = {
             'text': 'Второй комментарий'

@@ -259,6 +259,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_show_post_detail_comment(self):
+        """Тестирование комментариев в post_detail"""
         self.new_comment = Comment.objects.create(
             author=PostPagesTests.user2,
             text='Новый коммент',
@@ -286,6 +287,7 @@ class CacheTest(TestCase):
         self.authorized_client.force_login(CacheTest.user)
 
     def test_cache_index_page(self):
+        """Тестирование кэша в index"""
         self.post = Post.objects.create(
             author=CacheTest.user,
             text='Текст',
@@ -336,7 +338,7 @@ class FollowTest(TestCase):
         )
 
     def test_follow_users(self):
-        before_subscribe = Follow.objects.all()
+        """Проверка создания подписки"""
         self.authorized_client1.get(
             reverse('posts:profile_follow',
                     kwargs={'username': FollowTest.user1.username})
@@ -345,6 +347,14 @@ class FollowTest(TestCase):
             user=FollowTest.user2,
             author=FollowTest.user1
         ))
+
+    def test_unfollow_users(self):
+        """Проверка отписки от пользователя"""
+        before_subscribe = Follow.objects.all()
+        Follow.objects.create(
+            user=FollowTest.user2,
+            author=FollowTest.user1,
+        )
         self.authorized_client1.get(
             reverse('posts:profile_unfollow',
                     kwargs={'username': FollowTest.user1.username})
@@ -353,6 +363,7 @@ class FollowTest(TestCase):
         self.assertQuerysetEqual(before_subscribe, after_unsubscribe)
 
     def test_new_post_in_follow(self):
+        """Новый пост в follow_index после подписки на автора"""
         self.authorized_client1.get(
             reverse('posts:profile_follow',
                     kwargs={'username': FollowTest.user1.username}
@@ -361,11 +372,7 @@ class FollowTest(TestCase):
         response_follow_index = self.authorized_client1.get(
             reverse('posts:follow_index')
         )
-        response_unfollow_index = self.authorized_client2.get(
-            reverse('posts:follow_index')
-        )
         page_follow = len(response_follow_index.context['page_obj'])
-        page_unfollow = len(response_unfollow_index.context['page_obj'])
         self.post3 = Post.objects.create(
             author=FollowTest.user1,
             text='Пост3',
@@ -375,12 +382,25 @@ class FollowTest(TestCase):
         response_follow_index = self.authorized_client1.get(
             reverse('posts:follow_index')
         )
-        response_unfollow_index = self.authorized_client2.get(
-            reverse('posts:follow_index')
-        )
         self.assertEqual(len(
             response_follow_index.context['page_obj']),
             page_follow + 1)
+
+    def test_new_post_unfollow(self):
+        """Новый пост в follow_index без подписки на автора"""
+        response_unfollow_index = self.authorized_client2.get(
+            reverse('posts:follow_index')
+        )
+        page_unfollow = len(response_unfollow_index.context['page_obj'])
+        self.post3 = Post.objects.create(
+            author=FollowTest.user1,
+            text='Пост3',
+            id=3,
+            group=FollowTest.group,
+        )
+        response_unfollow_index = self.authorized_client2.get(
+            reverse('posts:follow_index')
+        )
         self.assertEqual(len(
             response_unfollow_index.context['page_obj']),
             page_unfollow)

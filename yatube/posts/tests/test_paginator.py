@@ -36,41 +36,47 @@ class PaginatorTest(TestCase):
         cache.clear()
 
     def test_index_first_page_paginator(self):
-        '''Проверка пагинации первой страницы index'''
+        """Проверка пагинации первой страницы index"""
         response = self.authorized_client.get(reverse('posts:index'))
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_index_second_page_paginator(self):
-        '''Проверка пагинации второй страницы index'''
+        """Проверка пагинации второй страницы index"""
         response = self.authorized_client.get(
             reverse('posts:index') + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_group_list_first_page_paginator(self):
-        '''Проверка пагинации первой страницы group_list'''
+        """Проверка пагинации первой страницы group_list"""
         response = self.authorized_client.get(
-            reverse('posts:group_list', kwargs={'slug': 'slug'})
+            reverse('posts:group_list',
+                    kwargs={'slug': PaginatorTest.group.slug})
         )
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_group_list_second_page_paginator(self):
-        '''Проверка пагинации второй страницы group_list'''
+        """Проверка пагинации второй страницы group_list"""
         response = self.authorized_client.get(
-            reverse('posts:group_list', kwargs={'slug': 'slug'}) + '?page=2'
+            reverse('posts:group_list',
+                    kwargs={'slug': PaginatorTest.group.slug}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_profile_first_page_paginator(self):
-        '''Проверка пагинации первой страницы profile'''
+        """Проверка пагинации первой страницы profile"""
         response = self.authorized_client.get(
-            reverse('posts:profile', kwargs={'username': 'auth'})
+            reverse(
+                'posts:profile',
+                kwargs={'username': PaginatorTest.user.username})
         )
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_profile_second_page_paginator(self):
-        '''Проверка пагинации второй страницы profile'''
+        """Проверка пагинации второй страницы profile"""
         response = self.authorized_client.get(
-            reverse('posts:profile', kwargs={'username': 'auth'}) + '?page=2'
+            reverse(
+                'posts:profile',
+                kwargs={'username': PaginatorTest.user.username}) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 3)
