@@ -162,3 +162,5 @@ coverage.xml
 *.cover
 
 media/
+
+.env

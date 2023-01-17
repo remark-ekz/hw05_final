@@ -1,20 +1,23 @@
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+SECRET_KEY = os.getenv('SECRET_KEY')
 
-SECRET_KEY = 'j)k-cs%(k0*)n*)xpnt&qny589l0job5ynu%0p43wf!(q&4aq_'
-
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    'www.volium.pythonanywhere.com',
-    'volium.pythonanywhere.com',
+    'localhost',
+    '127.0.0.1',
 ]
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'django_dump_load_utf8',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -99,6 +102,7 @@ USE_L10N = True
 
 USE_TZ = False
 
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
